@@ -29,7 +29,7 @@ if __name__ == '__main__':
     #   Learning params
     num_epochs = 30
     learning_rate = 0.001
-    weight_decay = 0.001
+    weight_decay = 0.1
     momentum = 0.9
 
     # GPU/CPU
@@ -85,29 +85,32 @@ if __name__ == '__main__':
     # Load model
     # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
     
+
+    # Resnet50
     model = torchvision.models.resnet50(weights=None)
     model.fc = nn.Linear(2048, num_classes)
     model = model.to(device)
     
     # torch.save(model.state_dict(), "test.pt")
     
+    # VGG11
     # model = VGG11().to(device)
 
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     test_critereon = nn.CrossEntropyLoss(reduction='sum')
-    # optimizer = torch.optim.SGD(
-    #     model.parameters(), 
-    #     lr=learning_rate, 
-    #     weight_decay = weight_decay, 
-    #     momentum = momentum
-    # )  
-    optimizer = torch.optim.Adam(
+    optimizer = torch.optim.SGD(
         model.parameters(), 
-        # lr=learning_rate, 
-        # weight_decay=weight_decay,
-        # momentum=momentum
-    )
+        lr=learning_rate, 
+        weight_decay = weight_decay, 
+        momentum = momentum
+    )  
+    # optimizer = torch.optim.Adam(
+    #     model.parameters(), 
+    #     # lr=learning_rate, 
+    #     # weight_decay=weight_decay,
+    #     # momentum=momentum
+    # )
 
     # Training the model
     total_step = len(train_loader)
