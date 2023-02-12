@@ -85,11 +85,15 @@ if __name__ == '__main__':
     # Load model
     # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
     
-
-    # Resnet50
-    model = torchvision.models.resnet50(weights=None)
-    model.fc = nn.Linear(2048, num_classes)
+    # EfficientNetv2
+    model = torchvision.models.efficientnet_v2_s(weights=None)
+    model.classifier[1] = nn.Linear(1280, num_classes)
     model = model.to(device)
+
+    # # Resnet50
+    # model = torchvision.models.resnet50(weights=None)
+    # model.fc = nn.Linear(2048, num_classes)
+    # model = model.to(device)
     
     # torch.save(model.state_dict(), "test.pt")
     
@@ -99,18 +103,16 @@ if __name__ == '__main__':
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     test_critereon = nn.CrossEntropyLoss(reduction='sum')
-    optimizer = torch.optim.SGD(
+    # optimizer = torch.optim.SGD(
+    #     model.parameters(), 
+    #     lr=learning_rate, 
+    #     weight_decay = weight_decay, 
+    #     momentum = momentum
+    # )  
+    optimizer = torch.optim.Adam(
         model.parameters(), 
         lr=learning_rate, 
-        weight_decay = weight_decay, 
-        momentum = momentum
-    )  
-    # optimizer = torch.optim.Adam(
-    #     model.parameters(), 
-    #     # lr=learning_rate, 
-    #     # weight_decay=weight_decay,
-    #     # momentum=momentum
-    # )
+    )
 
     # Training the model
     total_step = len(train_loader)
