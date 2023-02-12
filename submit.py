@@ -30,7 +30,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load and transform data
-    transform = transforms.Compose([
+    test_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     dataset = utils.ImagesDataset(
         './data/test_labels.csv',
         './data/test_bkp/test',
-        transform=transform)
+        transform=test_transform)
 
     plus = 4
     for i in range(len(dataset)):

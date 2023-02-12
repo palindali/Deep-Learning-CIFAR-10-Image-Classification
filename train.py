@@ -2,6 +2,7 @@
 
 import numpy as np
 import torch
+import torchvision
 from torchvision import datasets, transforms
 import torch.nn as nn
 from tqdm import tqdm
@@ -17,11 +18,15 @@ current_time = now.strftime("%B %d, %Y %H;%M;%S")
 
 if __name__ == '__main__':
     # Params
-        # Compute params
+    #   Model params
+    in_channels = 3
+    num_classes = 10
+
+    #   Compute params
     batch_size = 32
     num_workers = 4
-
-        # Learning params
+    
+    #   Learning params
     num_epochs = 30
     learning_rate = 0.001
     weight_decay = 0.001
@@ -32,11 +37,11 @@ if __name__ == '__main__':
 
     # Load and transform data
     transform = transforms.Compose([
-        transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),     #Rotates the image to a specified angel
-        transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
+        # transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
+        # transforms.RandomHorizontalFlip(),
+        # transforms.RandomRotation(10),     #Rotates the image to a specified angel
+        # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
+        # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
@@ -78,23 +83,31 @@ if __name__ == '__main__':
     )
 
     # Load model
-    model = VGG11().to(device)
+    # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
+    
+    model = torchvision.models.resnet50(weights=None)
+    model.fc = nn.Linear(2048, num_classes)
+    model = model.to(device)
+    
+    # torch.save(model.state_dict(), "test.pt")
+    
+    # model = VGG11().to(device)
 
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     test_critereon = nn.CrossEntropyLoss(reduction='sum')
-    optimizer = torch.optim.SGD(
-        model.parameters(), 
-        lr=learning_rate, 
-        weight_decay = weight_decay, 
-        momentum = momentum
-    )  
-    # optimizer = torch.optim.Adam(
+    # optimizer = torch.optim.SGD(
     #     model.parameters(), 
     #     lr=learning_rate, 
-    #     weight_decay=weight_decay,
-    #     momentum=momentum
-    # )
+    #     weight_decay = weight_decay, 
+    #     momentum = momentum
+    # )  
+    optimizer = torch.optim.Adam(
+        model.parameters(), 
+        # lr=learning_rate, 
+        # weight_decay=weight_decay,
+        # momentum=momentum
+    )
 
     # Training the model
     total_step = len(train_loader)
@@ -208,7 +221,7 @@ if __name__ == '__main__':
             tst_accu.append(accuracy)
         
         # Save output
-        torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/epoch_{epoch+1}_trn;{trn_accu[-1]}_val;{val_accu[-1]}_tst{tst_accu[-1]}.pt")
+        torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_val;{val_accu[-1]}_trn;{trn_accu[-1]}.pt")
 
     res_dict = {
         'Train Accuracy': trn_accu,
