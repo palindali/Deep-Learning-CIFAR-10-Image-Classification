@@ -1,0 +1,12 @@
+{
+    "aquatic mammal": 0,
+    "car": 1,
+    "deer": 2,
+    "fish": 3,
+    "flower": 4,
+    "horse": 5,
+    "ship": 6,
+    "small mammal": 7,
+    "tree": 8,
+    "truck": 9
+}

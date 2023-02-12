@@ -2,3 +2,4 @@
 *.pt
 *.zip
 pretrained models
+__pycache__/
