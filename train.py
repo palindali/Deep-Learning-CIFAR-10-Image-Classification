@@ -40,7 +40,7 @@ if __name__ == '__main__':
     transform = transforms.Compose([
         # transforms.RandomCrop(32, padding=4), 
         # transforms.RandomHorizontalFlip(),
-        # transforms.GaussianBlur(5, (0.1, 5)), 
+        transforms.GaussianBlur(5, (0.1, 5)), 
         # transforms.RandomRotation(10),     #Rotates the image to a specified angel
         # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
         # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params

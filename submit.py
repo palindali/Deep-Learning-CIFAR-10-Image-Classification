@@ -19,7 +19,7 @@ from models import AliNet, VGG11
 import params, utils
 
 # !!!!!!!!!CHANGE HERE!!!!!!!!!!!!
-model_name = '15'
+model_name = '23'
 
 if __name__ == '__main__':
     # Params
