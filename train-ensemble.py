@@ -28,7 +28,7 @@ if __name__ == '__main__':
     num_workers = 4
     
     #   Learning params
-    num_epochs = 30
+    num_epochs = 50
     learning_rate = 0.001
     weight_decay = 0.001
     
