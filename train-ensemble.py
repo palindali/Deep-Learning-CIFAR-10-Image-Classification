@@ -28,21 +28,26 @@ if __name__ == '__main__':
     num_workers = 4
     
     #   Learning params
-    num_epochs = 15
+    num_epochs = 30
     learning_rate = 0.001
     weight_decay = 0.001
-
+    
+    n_classifiers = 7
+    
     # GPU/CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load and transform data
     transform = transforms.Compose([
+        transforms.RandomCrop(32, padding=4), 
+        transforms.RandomHorizontalFlip(),
+        transforms.GaussianBlur(3, (0.1, 3)), 
         # transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
-        transforms.RandomHorizontalFlip(p=0.1),
-        transforms.RandomRotation(10),     #Rotates the image to a specified angel
-        transforms.RandomInvert(p=0.1),
-        transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
+        # transforms.RandomHorizontalFlip(p=0.1),
+        # transforms.RandomRotation(10),     #Rotates the image to a specified angel
+        # transforms.RandomInvert(p=0.1),
+        # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
+        # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
@@ -72,7 +77,7 @@ if __name__ == '__main__':
     # Define the ensemble
     ensemble = BaggingClassifier(
         estimator=VGG11,               # estimator is your pytorch model
-        n_estimators=5,                        # number of base estimators
+        n_estimators=n_classifiers,                        # number of base estimators
         cuda=True
     )
 

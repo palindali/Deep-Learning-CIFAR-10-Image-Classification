@@ -23,7 +23,7 @@ if __name__ == '__main__':
     num_classes = 10
 
     #   Compute params
-    batch_size = 128
+    batch_size = 16
     num_workers = 4
     
     #   Learning params
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     learning_rate = 0.001
     weight_decay = 0.001
 
-    early_stop = 5
+    early_stop = 7
 
     # GPU/CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
