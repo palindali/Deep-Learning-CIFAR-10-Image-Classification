@@ -28,7 +28,7 @@ if __name__ == '__main__':
     num_workers = 4
     
     #   Learning params
-    num_epochs = 50
+    num_epochs = 30
     learning_rate = 0.001
     weight_decay = 0.001
     
@@ -42,12 +42,10 @@ if __name__ == '__main__':
         transforms.RandomCrop(32, padding=4), 
         transforms.RandomHorizontalFlip(),
         transforms.GaussianBlur(3, (0.1, 3)), 
-        # transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
-        # transforms.RandomHorizontalFlip(p=0.1),
-        # transforms.RandomRotation(10),     #Rotates the image to a specified angel
-        # transforms.RandomInvert(p=0.1),
-        # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
-        # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
+        transforms.RandomRotation(10),     #Rotates the image to a specified angel
+        transforms.RandomInvert(p=0.1),
+        transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])

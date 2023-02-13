@@ -20,7 +20,7 @@ from models import AliNet, VGG11
 import params, utils
 
 # !!!!!!!!!CHANGE HERE!!!!!!!!!!!!
-model_name = '21'
+model_name = '29'
 
 if __name__ == '__main__':
     # Params
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     # Ensemble
     ensemble = BaggingClassifier(
         estimator=VGG11,               # estimator is your pytorch model
-        n_estimators=5,                        # number of base estimators
+        n_estimators=7,                        # number of base estimators
         cuda=True
     )
     
@@ -129,4 +129,4 @@ if __name__ == '__main__':
     with open(f"./stuff/model_checkpoints/ind.json") as file:
         exp_ind = json.load(file)
 
-    df.to_csv(f'./stuff/submissions/predictions_{sub_ind}(exp_{exp_ind}).csv', index=False)
+    df.to_csv(f'./stuff/submissions/predictions_{sub_ind}(exp_{model_name}).csv', index=False)
