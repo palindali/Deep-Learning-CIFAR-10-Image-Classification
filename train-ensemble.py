@@ -9,7 +9,7 @@ from tqdm import tqdm
 from datetime import datetime
 import os
 import json
-from torchensemble import VotingClassifier
+from torchensemble import VotingClassifier, BaggingClassifier
 
 from models import AliNet, VGG11
 
@@ -37,9 +37,10 @@ if __name__ == '__main__':
 
     # Load and transform data
     transform = transforms.Compose([
-        transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
-        transforms.RandomHorizontalFlip(),
+        # transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
+        transforms.RandomHorizontalFlip(p=0.1),
         transforms.RandomRotation(10),     #Rotates the image to a specified angel
+        transforms.RandomInvert(p=0.1),
         transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
         transforms.ToTensor(),
@@ -49,12 +50,12 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
-    
+
     # Training data
     # Test data
     train_data = datasets.ImageFolder('./data/train', transform=transform)
     test_data = datasets.ImageFolder('./data/test', transform=test_transform)
-    
+
     # Dataloaders
     train_loader = torch.utils.data.DataLoader(
         train_data, batch_size=batch_size, shuffle=True, num_workers=num_workers, 
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     # base_classifier = VGG11().to(device)
 
     # Define the ensemble
-    ensemble = GradientBoostingClassifier(
+    ensemble = BaggingClassifier(
         estimator=VGG11,               # estimator is your pytorch model
         n_estimators=5,                        # number of base estimators
         cuda=True
