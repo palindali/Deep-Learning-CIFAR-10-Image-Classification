@@ -10,6 +10,7 @@ from datetime import datetime
 import os
 import json
 import matplotlib.pyplot as plt
+import torchvision
 
 from PIL import Image
 
@@ -19,7 +20,7 @@ from models import AliNet, VGG11
 import params, utils
 
 # !!!!!!!!!CHANGE HERE!!!!!!!!!!!!
-model_name = '9'
+model_name = '15'
 
 if __name__ == '__main__':
     # Params
@@ -65,7 +66,14 @@ if __name__ == '__main__':
     )
 
     # Test data
-    model = VGG11().to(device)
+    # Resnet50
+    # model = torchvision.models.resnet50(weights=None)
+    # model.fc = nn.Linear(2048, 10)
+    # model = model.to(device)
+
+    # #VGG11
+    # model = VGG11().to(device)
+    
     model.load_state_dict(torch.load(f"./stuff/model_checkpoints/best/{model_name}.pt"))
     model.eval()
     
