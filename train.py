@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
     #   Learning params
     num_epochs = 30
-    learning_rate = 0.0001
+    learning_rate = 0.001
     weight_decay = 0.001
 
     early_stop = 5
@@ -247,7 +247,7 @@ if __name__ == '__main__':
             if early_stopping_counter >= early_stop:
                 print('Early stopping')
                 break
-        print(early_stopping_counter)
+        # print(early_stopping_counter)
 
     res_dict = {
         'Train Accuracy': trn_accu,

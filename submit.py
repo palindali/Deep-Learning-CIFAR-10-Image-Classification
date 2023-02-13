@@ -70,8 +70,8 @@ if __name__ == '__main__':
     # model.fc = nn.Linear(2048, 10)
     # model = model.to(device)
 
-    # #VGG11
-    # model = VGG11().to(device)
+    #VGG11
+    model = VGG11().to(device)
     
     model.load_state_dict(torch.load(f"./stuff/model_checkpoints/best/{model_name}.pt"))
     model.eval()
