@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # Training data
     train_data = datasets.ImageFolder('./data/train', transform=transform)
     # Test data
-    test_data = datasets.ImageFolder('./data/test', transform=test_transform)
+    test_data = datasets.ImageFolder('./data/test_new', transform=test_transform)
     
     # Save class labeling
     with open(f"./stuff/internal_class_labeling.json", "w") as write_file:

@@ -57,7 +57,7 @@ if __name__ == '__main__':
     # Training data
     # Test data
     train_data = datasets.ImageFolder('./data/train', transform=transform)
-    test_data = datasets.ImageFolder('./data/test', transform=test_transform)
+    test_data = datasets.ImageFolder('./data/test_new', transform=test_transform)
 
     # Dataloaders
     train_loader = torch.utils.data.DataLoader(
