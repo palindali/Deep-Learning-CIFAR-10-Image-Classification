@@ -38,9 +38,9 @@ if __name__ == '__main__':
 
     # Load and transform data
     transform = transforms.Compose([
-        # transforms.RandomCrop(32, padding=4), 
-        # transforms.RandomHorizontalFlip(),
-        transforms.GaussianBlur(5, (0.1, 5)), 
+        transforms.RandomCrop(32, padding=4), 
+        transforms.RandomHorizontalFlip(),
+        transforms.GaussianBlur(3, (0.1, 3)), 
         # transforms.RandomRotation(10),     #Rotates the image to a specified angel
         # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
         # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         
         # Training
         model.train()
-        print(f"Epoch {epoch+1}:")
+        print(f"---Epoch {epoch+1}:")
         for i, (images, labels) in enumerate(tqdm(train_loader, "Training", leave=False)):  
             # Move tensors to the configured device
             images = images.to(device)
@@ -247,7 +247,7 @@ if __name__ == '__main__':
             if early_stopping_counter >= early_stop:
                 print('Early stopping')
                 break
-        # print(early_stopping_counter)
+        print("+Early Stopping Counter:", early_stopping_counter)
 
     res_dict = {
         'Train Accuracy': trn_accu,
