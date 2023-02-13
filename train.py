@@ -61,12 +61,12 @@ if __name__ == '__main__':
         json.dump(train_data.class_to_idx, write_file, indent=4)
 
     # # Split the data
-    # data_len = len(train_data)
+    data_len = len(train_data)
 
-    # valid_len = int(data_len * 0)
-    # train_len = data_len - valid_len
+    valid_len = int(data_len * 0.1)
+    train_len = data_len - valid_len
 
-    # train_data, valid_data = torch.utils.data.random_split(train_data, [train_len, valid_len])
+    train_data, valid_data = torch.utils.data.random_split(train_data, [train_len, valid_len])
 
     # Dataloaders
     train_loader = torch.utils.data.DataLoader(
@@ -74,10 +74,10 @@ if __name__ == '__main__':
         pin_memory=True
     )
 
-    # valid_loader = torch.utils.data.DataLoader(
-    #     valid_data, batch_size=batch_size, shuffle=False, num_workers=num_workers, 
-    #     pin_memory=True
-    # )
+    valid_loader = torch.utils.data.DataLoader(
+        valid_data, batch_size=batch_size, shuffle=False, num_workers=num_workers, 
+        pin_memory=True
+    )
 
     test_loader = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False, num_workers=num_workers, 
@@ -110,20 +110,21 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(
         model.parameters(), 
         lr=learning_rate, 
-        weight_decay = weight_decay, 
+        weight_decay=weight_decay, 
         momentum = 0.9
     )  
     # optimizer = torch.optim.Adam(
     #     model.parameters(), 
     #     lr=learning_rate, 
+    #     weight_decay=weight_decay, 
     # )
 
     # Training the model
     total_step = len(train_loader)
 
-    trn_accu = []
-    val_accu = []
-    tst_accu = []
+    train_acc = []
+    valid_acc = []
+    test_acc = []
     model_state_dicts = []
 
     # Advance experiment index
@@ -137,6 +138,7 @@ if __name__ == '__main__':
     os.makedirs(f"./stuff/model_checkpoints/{model_dir}")
 
     best_test_accuracy = -1
+    best_valid_accuracy = -1
     for epoch in range(num_epochs):
         
         # Training
@@ -183,30 +185,30 @@ if __name__ == '__main__':
             loss = running_loss / total
             print(f"Accuracy of the network on the {total} training images: {accuracy} %") 
             print(f"Training Loss: {loss}")
-            trn_accu.append(accuracy)
+            train_acc.append(accuracy)
         
-        # # Validation error
-        # with torch.no_grad():
-        #     correct = 0
-        #     total = 0
-        #     running_loss = 0
-        #     for images, labels in tqdm(valid_loader, "Testing on Valid Set", leave=False):
-        #         images = images.to(device)
-        #         labels = labels.to(device)
-        #         outputs = model(images)
-        #         _, predicted = torch.max(outputs.data, 1)
-        #         total += labels.size(0)
-        #         correct += (predicted == labels).sum().item()
+        # Validation error
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            running_loss = 0
+            for images, labels in tqdm(valid_loader, "Testing on Valid Set", leave=False):
+                images = images.to(device)
+                labels = labels.to(device)
+                outputs = model(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
                 
-        #         loss = test_critereon(outputs, labels)
-        #         running_loss += loss.item()
-        #         del images, labels, outputs
+                loss = test_critereon(outputs, labels)
+                running_loss += loss.item()
+                del images, labels, outputs
 
-        #     accuracy = 100 * correct / total
-        #     loss = running_loss / total
-        #     print(f"Accuracy of the network on the {total} validation images: {accuracy} %") 
-        #     print(f"Testing Loss: {loss}")
-        #     val_accu.append(accuracy)
+            valid_accuracy = 100 * correct / total
+            valid_loss = running_loss / total
+            print(f"Accuracy of the network on the {total} validation images: {valid_accuracy} %") 
+            print(f"Testing Loss: {valid_loss}")
+            valid_acc.append(valid_accuracy)
         
         # Test error
         with torch.no_grad():
@@ -229,19 +231,20 @@ if __name__ == '__main__':
             test_loss = running_loss / total
             print(f"Accuracy of the network on the {total} testing images: {test_accuracy} %") 
             print(f"Testing Loss: {test_loss}")
-            tst_accu.append(test_accuracy)
+            test_acc.append(test_accuracy)
         
         # Save output
-        # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_val;{val_accu[-1]}_trn;{trn_accu[-1]}.pt")
-        # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn;{trn_accu[-1]}.pt")
+        # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_val{val_accu[-1]}_trn{trn_accu[-1]}.pt")
+        # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn{trn_accu[-1]}.pt")
 
         # Check if this epoch's validation loss is the best so far
-        if test_accuracy > best_test_accuracy:
-            best_test_accuracy = test_accuracy
+        if valid_accuracy > best_valid_accuracy:
+            best_valid_accuracy = valid_accuracy
             early_stopping_counter = 0
             # Save the model's state dictionary
             print("Best validation accuracy saving epoch ", epoch)
-            torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn;{trn_accu[-1]}.pt")
+            torch.save(model.state_dict(), f"./stuff/model_checkpoints/\
+                       {model_dir}/ep{epoch+1}_tst{test_acc[-1]}_val{valid_acc[-1]}_trn{train_acc[-1]}.pt")
         else:
             early_stopping_counter += 1
             if early_stopping_counter >= early_stop:
@@ -249,10 +252,24 @@ if __name__ == '__main__':
                 break
         print("+Early Stopping Counter:", early_stopping_counter)
 
+        # # Check if this epoch's test loss is the best so far
+        # if test_accuracy > best_test_accuracy:
+        #     best_test_accuracy = test_accuracy
+        #     early_stopping_counter = 0
+        #     # Save the model's state dictionary
+        #     print("Best validation accuracy saving epoch ", epoch)
+        #     torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn;{trn_accu[-1]}.pt")
+        # else:
+        #     early_stopping_counter += 1
+        #     if early_stopping_counter >= early_stop:
+        #         print('Early stopping')
+        #         break
+        # print("+Early Stopping Counter:", early_stopping_counter)
+
     res_dict = {
-        'Train Accuracy': trn_accu,
-        # 'Validation Accuracy': val_accu,
-        'Test Accuracy': tst_accu,
+        'Train Accuracy': train_acc,
+        'Validation Accuracy': valid_acc,
+        'Test Accuracy': test_acc,
     }
     with open(f"./stuff/model_checkpoints/{model_dir}/accuracies.json", "w") as write_file:
         json.dump(res_dict, write_file, indent=4)
