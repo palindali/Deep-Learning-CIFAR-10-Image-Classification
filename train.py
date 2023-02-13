@@ -10,7 +10,7 @@ from datetime import datetime
 import os
 import json
 
-from models import AliNet, VGG11
+from models import AliNet, VGG11, Wide_ResNet
 
 now = datetime.now()
 
@@ -23,26 +23,27 @@ if __name__ == '__main__':
     num_classes = 10
 
     #   Compute params
-    batch_size = 32
+    batch_size = 128
     num_workers = 4
     
     #   Learning params
     num_epochs = 30
-    learning_rate = 0.001
+    learning_rate = 0.0001
     weight_decay = 0.001
 
-    early_stop = 3
+    early_stop = 5
 
     # GPU/CPU
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load and transform data
     transform = transforms.Compose([
-        transforms.RandomCrop(32, padding=4, padding_mode='reflect'), 
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),     #Rotates the image to a specified angel
-        transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
+        # transforms.RandomCrop(32, padding=4), 
+        # transforms.RandomHorizontalFlip(),
+        # transforms.GaussianBlur(5, (0.1, 5)), 
+        # transforms.RandomRotation(10),     #Rotates the image to a specified angel
+        # transforms.RandomAffine(0, shear=10, scale=(0.8,1.2)), #Performs actions like zooms, change shear angles.
+        # transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2), # Set the color params
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
@@ -100,6 +101,9 @@ if __name__ == '__main__':
     # VGG11
     model = VGG11().to(device)
 
+    # # Wide ResNet
+    # model = Wide_ResNet(28, 10, 0.3, 10).to(device)
+
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     test_critereon = nn.CrossEntropyLoss(reduction='sum')
@@ -132,7 +136,7 @@ if __name__ == '__main__':
     model_dir = f"{exp_ind} - {current_time}"
     os.makedirs(f"./stuff/model_checkpoints/{model_dir}")
 
-    best_test_loss = 1e5
+    best_test_accuracy = -1
     for epoch in range(num_epochs):
         
         # Training
@@ -221,28 +225,29 @@ if __name__ == '__main__':
                 running_loss += loss.item()
                 del images, labels, outputs
 
-            accuracy = 100 * correct / total
+            test_accuracy = 100 * correct / total
             test_loss = running_loss / total
-            print(f"Accuracy of the network on the {total} testing images: {accuracy} %") 
+            print(f"Accuracy of the network on the {total} testing images: {test_accuracy} %") 
             print(f"Testing Loss: {test_loss}")
-            tst_accu.append(accuracy)
+            tst_accu.append(test_accuracy)
         
         # Save output
         # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_val;{val_accu[-1]}_trn;{trn_accu[-1]}.pt")
         # torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn;{trn_accu[-1]}.pt")
 
         # Check if this epoch's validation loss is the best so far
-        if test_loss < best_test_loss:
-            best_test_loss = test_loss
+        if test_accuracy > best_test_accuracy:
+            best_test_accuracy = test_accuracy
             early_stopping_counter = 0
             # Save the model's state dictionary
-            print("Best validation loss saving epoch ", epoch)
+            print("Best validation accuracy saving epoch ", epoch)
             torch.save(model.state_dict(), f"./stuff/model_checkpoints/{model_dir}/ep{epoch+1}_tst{tst_accu[-1]}_trn;{trn_accu[-1]}.pt")
         else:
             early_stopping_counter += 1
             if early_stopping_counter >= early_stop:
                 print('Early stopping')
                 break
+        print(early_stopping_counter)
 
     res_dict = {
         'Train Accuracy': trn_accu,

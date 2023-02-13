@@ -11,12 +11,11 @@ import os
 import json
 import matplotlib.pyplot as plt
 import torchvision
-
 from PIL import Image
+from torchensemble.utils import io
 
 
 from models import AliNet, VGG11
-
 import params, utils
 
 # !!!!!!!!!CHANGE HERE!!!!!!!!!!!!
@@ -65,7 +64,7 @@ if __name__ == '__main__':
         pin_memory=True
     )
 
-    # Test data
+    # Models
     # Resnet50
     # model = torchvision.models.resnet50(weights=None)
     # model.fc = nn.Linear(2048, 10)
@@ -98,22 +97,6 @@ if __name__ == '__main__':
     df = pd.DataFrame(list(zip(
             image_names, predictions
             )), columns=['id','label'])
-    
-    # predictions = []
-    # with torch.no_grad():
-    #     for image_id in tqdm(range(10000), "Predicting on Test"):
-    #         img_path = './data/test_bkp/test/'+str(image_id)+'.jpg'
-    #         img = Image.open(img_path)
-    #         image = transform(img)
-    #         outputs = model(image.to("cuda").unsqueeze(0))
-
-    #         _, predicted = torch.max(outputs.data, 1)
-    #         predictions += predicted.tolist()
-        
-    # # Make preds dataframe
-    # df2 = pd.DataFrame(list(zip(
-    #         list(range(len(predictions))), predictions
-    #         )), columns=['id','label'])
 
     # df.to_csv(f'./stuff/submissions/submission_{submission}_notmapped.csv', index=False)
 
@@ -152,4 +135,4 @@ if __name__ == '__main__':
     with open(f"./stuff/model_checkpoints/ind.json") as file:
         exp_ind = json.load(file)
 
-    df.to_csv(f'./stuff/submissions/submission_{sub_ind}(exp_{exp_ind}).csv', index=False)
+    df.to_csv(f'./stuff/submissions/predictions_{sub_ind}(exp_{exp_ind}).csv', index=False)
